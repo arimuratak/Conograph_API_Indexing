@@ -1,0 +1,10 @@
+<ZCodeParameters>
+  <ConographInputFile>
+    <!-- Control parameters for calculation.-->
+    <ControlParamFile> sample.inp.xml </ControlParamFile>
+    <!-- Peak-position data.-->
+    <PeakDataFile> sample_pks.histogramIgor </PeakDataFile>
+    <!-- Output file -->
+    <OutputFile> output/sample.index.xml </OutputFile>
+  </ConographInputFile>
+</ZCodeParameters>

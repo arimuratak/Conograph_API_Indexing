@@ -1,0 +1,120 @@
+Reading cntl.inp.xml...
+
+ConographInputFile: 
+  ControlParamFile: sample.inp.xml 
+  PeakDataFile: sample_pks.histogramIgor 
+  OutputFile: output/sample.index.xml 
+
+ConographParameters: 
+  SearchLevel: 0 
+  MaxNumberOfPeaks: AUTO 
+  IsAngleDispersion: 0 
+  ConversionParameters:  9.03976 9965.02 5.88424 
+  WaveLength: 1.54056 
+  ZeroPointShiftParameter:  0.0 
+  MaxNumberOfPeaksForFOM: 20 
+  MinNumberOfMillerIndicesInRange: AUTO 
+  MaxNumberOfMillerIndicesInRange: AUTO 
+  MinFOM: 3.0 
+  MinUnitCellEdgeABC: 0.0 
+  MaxUnitCellEdgeABC: 1000.0 
+  Resolution: 0.03 
+  MinPrimitiveUnitCellVolume: AUTO 
+  MaxPrimitiveUnitCellVolume: AUTO 
+  MaxNumberOfTwoDimTopographs: AUTO 
+  MaxNumberOfLatticeCandidates: AUTO 
+  CriticalValueForLinearSum: 1.0 
+  ThresholdOnNormM: 1.9 
+  ThresholdOnRevM: 1.0 
+  MinDistanceBetweenLatticePoints: 2.0 
+  MaxNumberOfSolutionsForEachBravaisLattice: 1000 
+  OutputTriclinic: 1 
+  OutputMonoclinicP: 1 
+  OutputMonoclinicB: 1 
+  OutputOrthorhombicP: 1 
+  OutputOrthorhombicC: 1 
+  OutputOrthorhombicI: 1 
+  OutputOrthorhombicF: 1 
+  OutputTetragonalP: 1 
+  OutputTetragonalI: 1 
+  OutputRhombohedral: 1 
+  OutputHexagonal: 1 
+  OutputCubicP: 1 
+  OutputCubicI: 1 
+  OutputCubicF: 1 
+  NumberOfThreadsToUse: 19 
+  AxisForRhombohedralSymmetry: Hexagonal 
+  AxisForMonoclinicSymmetry: B 
+
+The number of threads is set to 19
+<MaxNumberOfPeaks> is set to 20
+<MaxNumberOfTwoDimTopographs> is set to 100.
+<MaxNumberOfLatticeCandidates> is set to 64000.
+<MinPrimitiveUnitCellVolume> is set to 5.
+<MaxPrimitiveUnitCellVolume> is set to 61.521.
+<MaxNumberOfMillerIndicesInRange> is set to 128.
+<MinNumberOfMillerIndicesInRange> is set to 12.
+
+The range of d^*-value : sqrt(the minimum of q-values)--sqrt(the maximum of q-values) = 0.318822--1.67623
+
+Searching for q-values satisfying the Ito equation 2(q1 + q2) = q3 + q4...
+Number of (q1, q2, q3, q4) satisfying 2(q1 + q2) = q3 + q4 : 201
+Number of (q?, q2, q3, q4) detected from the equation 3q2 + q4 = 3q3 + q5 : 451
+Number of (q1, q2, q3, q?) added under supposition of extinction rules: 111
+
+Making 2-dimensional topographs...
+Number of topographs constructed : 100
+Maximum number of q_values contained in a topograph : 7
+Number of q_values contained in the 50th topograph : 4
+The program selected 100 quadruples (q1, q2, q3, q4) from 50 topographs.
+
+The number of nodes (q1, q2, q3), (q1, q2, q4) generated from quadruples (q1, q2, q3, q4) : 372
+Searching for combinations of (q1, q2, q3), (q1, q4, q5) and q6 to construct 3-dim lattices....(This process might take several minutes...)
+Permitted range of primitive-cell volume = 5--61.521
+Number of solutions generated from combinations of four nodes (q1,q2,q3) in CPU time 0 [sec.] : 3576
+Solutions satisfy one of the following conditions.
+> Unitcell volume : 8.14924--61.5019
+
+The program has obtained 3576 unit-cell parameters in CPU time : 0 [sec.]
+
+Determination of the Bravais type is being carried out...
+(Solutions with Mwu less than 1.9 or Mrev less than 1 are automatically removed).
+All the unit-cell parameters are being optimized by linear least squares...
+The program has selected 1000 triclinic solutions using the Wu figure of merit.
+
+(2) The number of candidates for Monoclinic(P) : 748
+(3) The number of candidates for Monoclinic(C) : 1000
+(4) The number of candidates for Orthorhombic(P) : 159
+(5) The number of candidates for Orthorhombic(C) : 653
+(6) The number of candidates for Orthorhombic(I) : 707
+(7) The number of candidates for Orthorhombic(F) : 556
+(8) The number of candidates for Tetragonal(P) : 8
+(9) The number of candidates for Tetragonal(I) : 311
+(10) The number of candidates for Rhombohedral : 1000
+(11) The number of candidates for Hexagonal : 76
+(12) The number of candidates for Cubic(P) : 2
+(13) The number of candidates for Cubic(I) : 6
+(14) The number of candidates for Cubic(F) : 98
+
+Selecting lattices with the best figure of merit among almost equivalent solutions...
+(1) The number of candidates for Triclinic : 1000 -> 280
+(2) The number of candidates for Monoclinic(P) : 748 -> 408
+(3) The number of candidates for Monoclinic(C) : 1000 -> 52
+(4) The number of candidates for Orthorhombic(P) : 159 -> 100
+(5) The number of candidates for Orthorhombic(C) : 653 -> 235
+(6) The number of candidates for Orthorhombic(I) : 707 -> 268
+(7) The number of candidates for Orthorhombic(F) : 556 -> 231
+(8) The number of candidates for Tetragonal(P) : 8 -> 7
+(9) The number of candidates for Tetragonal(I) : 311 -> 23
+(10) The number of candidates for Rhombohedral : 1000 -> 227
+(11) The number of candidates for Hexagonal : 76 -> 33
+(12) The number of candidates for Cubic(P) : 2 -> 2
+(13) The number of candidates for Cubic(I) : 6 -> 4
+(14) The number of candidates for Cubic(F) : 98 -> 3
+
+The Bravais lattice determination and refinement of unit-cell parameters finish in CPU time : 1 [sec.]
+
+Outputting results...
+Input a lattice number in output/sample.index.xml
+(Then, the program outputs an IGOR text file for comparison of calculated peak-positions with the powder diffraction pattern.
+Input "quit" to finish the program.) :quit.
