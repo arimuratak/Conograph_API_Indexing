@@ -4,6 +4,10 @@ import pandas as pd
 import subprocess
 import os
 import stat
+import glob
+import time
+import threading
+lock = threading.Lock()
 
 def read_cntl_inp_xml (path):
     # XMLファイルを読み込む
@@ -29,20 +33,56 @@ PATH_param, PATH_peak, PATH_out =  read_cntl_inp_xml (PATH_cntl)
 FOLDER_out = os.path.dirname (PATH_out)
 if FOLDER_out is not None:
     os.makedirs (FOLDER_out, exist_ok = True)
-PATH_exe = os.path.join (CURRENT_DIR, 'Conograph')
+
+if os.name == 'nt':
+    PATH_exe = '.\Conograph.exe'
+else:
+    PATH_exe = os.path.join (CURRENT_DIR, 'Conograph')
+
 PATH_log = os.path.join (CURRENT_DIR, 'LOG_CONOGRAPH.txt')
 
 app = Flask(__name__)
+
+def exec_run_cmd (cmd):
+    if os.name != 'nt':
+        if not os.access (PATH_exe, os.X_OK):
+            os.chmod(PATH_exe, os.stat (PATH_exe).st_mode | stat.S_IEXEC)
+     
+    result = subprocess.run([PATH_exe],
+                    input = cmd,
+                capture_output = True, text = True)    
+
+    return result
+
+
+def clean_output_folder ():
+    paths = glob.glob ('output/*.*')
+    paths = [path for path in paths if 'index.xml' not in path]
+    if len (paths) > 0:
+        for path in paths:
+            os.remove (path)
+
+def search_file (suffix = 'xml', matching_pattern = 'sample_lattice('):
+    paths = glob.glob ('output/*.' + suffix)
+    paths = [path for path in paths if matching_pattern in path]
+    if len (paths) > 0: return paths[0]
+    else: return None
+
+def send_file_with_name (path):
+    response = send_file (path, as_attachment = True)
+    response.headers ['file_name'] = path
+    return response
 
 @app.route("/run_cpp", methods = ["POST"])
 def run_cpp_with_cntl():
     if os.path.exists (PATH_param): os.remove (PATH_param)
     if os.path.exists (PATH_peak): os.remove (PATH_peak)
-    if os.path.exists (PATH_out): os.remove (PATH_out)
+    #if os.path.exists (PATH_out): os.remove (PATH_out)
     if os.path.exists (PATH_log): os.remove (PATH_log)
 
     pathDict = {'xml' : PATH_param, 'txt' : PATH_peak,
                 'histogramIgor' : PATH_peak, 'histogramIgor_pk' : PATH_peak}
+
     for key in request.files:
         f = request.files[key]
         fname = f.name
@@ -51,25 +91,40 @@ def run_cpp_with_cntl():
         path = os.path.join (CURRENT_DIR, path)
         f.save(path)
 
-    if not os.access (PATH_exe, os.X_OK):
-       os.chmod(PATH_exe, os.stat (PATH_exe).st_mode | stat.S_IEXEC)
-    result = subprocess.run([PATH_exe], input = 'quit\n',
-                    capture_output=True, text=True)
-    #result = subprocess.run(
-    #                ['.\Conograph.exe'],  # 実行するexeのパス
-    #                input = 'quit\n',                  # 入力として quit を渡す
-    #                text = True,                       # strとして渡す（バイナリでなく）
-    #                capture_output = True)
-    
+    cmd = request.form.get('cmd', 'quit\n')
+
+    clean_output_folder ()
+    result = exec_run_cmd (cmd)
+
     if os.path.exists (PATH_out):
-        return send_file(PATH_out, as_attachment = True), 200
+        response = send_file_with_name (PATH_out)
+        return response, 200
     else:
         return jsonify({"error": "出力ファイルがありません"}), 500
+
+@app.route ('/get_xml', methods = ['POST'])
+def get_xml ():
+    path = search_file ('xml')
+    if path is not None:
+        response = send_file_with_name (path)
+        return response, 200
+    else:
+        return jsonify ({'error' : 'No output file'})
+
+@app.route ('/get_histogramIgor', methods = ['POST'])
+def get_histogramIgor ():
+    path = search_file ('histogramIgor')
+    if path is not None:
+        response = send_file_with_name (path)
+        return response, 200
+    else:
+        return jsonify ({'error' : 'No output file'}), 500
 
 @app.route ('/log_file', methods = ['POST'])
 def log_file ():
     if os.path.exists (PATH_log):
-        return send_file (PATH_log, as_attachment = True), 200
+        response = send_file_with_name (PATH_log)
+        return response, 200
     else:
         return jsonify ({'error' : '送信ファイルがありません'}), 500
 
