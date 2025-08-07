@@ -1,11 +1,10 @@
 from flask import Flask, request, send_file, jsonify
 import xml.etree.ElementTree as ET
-import pandas as pd
 import subprocess
 import os
 import stat
 import glob
-import time
+import shutil
 import threading
 lock = threading.Lock()
 
@@ -29,6 +28,8 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 os.chdir(CURRENT_DIR)
 PATH_cntl = os.path.join (CURRENT_DIR, 'cntl.inp.xml')
 PATH_param, PATH_peak, PATH_out =  read_cntl_inp_xml (PATH_cntl)
+PATH_zip = os.path.join (CURRENT_DIR, 'archive.zip')
+PATH_output = os.path.join (CURRENT_DIR, 'output')
 
 FOLDER_out = os.path.dirname (PATH_out)
 if FOLDER_out is not None:
@@ -38,22 +39,24 @@ if os.name == 'nt':
     PATH_exe = '.\Conograph.exe'
 else:
     PATH_exe = os.path.join (CURRENT_DIR, 'Conograph')
+    if not os.access (PATH_exe, os.X_OK):
+            os.chmod(PATH_exe, os.stat (PATH_exe).st_mode | stat.S_IEXEC)
 
 PATH_log = os.path.join (CURRENT_DIR, 'LOG_CONOGRAPH.txt')
+
 
 app = Flask(__name__)
 
 def exec_run_cmd (cmd):
-    if os.name != 'nt':
-        if not os.access (PATH_exe, os.X_OK):
-            os.chmod(PATH_exe, os.stat (PATH_exe).st_mode | stat.S_IEXEC)
+    #if os.name != 'nt':
+    #    if not os.access (PATH_exe, os.X_OK):
+    #        os.chmod(PATH_exe, os.stat (PATH_exe).st_mode | stat.S_IEXEC)
      
     result = subprocess.run([PATH_exe],
                     input = cmd,
                 capture_output = True, text = True)    
 
     return result
-
 
 def clean_output_folder ():
     paths = glob.glob ('output/*.*')
@@ -62,7 +65,8 @@ def clean_output_folder ():
         for path in paths:
             os.remove (path)
 
-def search_file (suffix = 'xml', matching_pattern = 'sample_lattice('):
+def search_file (suffix = 'xml',
+        matching_pattern = 'sample_lattice('):
     paths = glob.glob ('output/*.' + suffix)
     paths = [path for path in paths if matching_pattern in path]
     if len (paths) > 0: return paths[0]
@@ -127,6 +131,21 @@ def log_file ():
         return response, 200
     else:
         return jsonify ({'error' : '送信ファイルがありません'}), 500
+
+@app.route ('/get_output_zip', methods = ['POST'])
+def get_output_zip ():
+    if os.path.exists (PATH_zip):
+        os.remove (PATH_zip)
+
+    shutil.make_archive('archive', format = 'zip',
+                root_dir = PATH_output)
+
+    if os.path.exists (PATH_zip):
+        response = send_file_with_name (PATH_zip)
+        return response, 200
+    else:
+        return jsonify ({'error' : '送信ファイルがありません'}), 500
+    
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port = 8100, debug = False)
