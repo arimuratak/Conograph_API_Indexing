@@ -47,11 +47,7 @@ PATH_log = os.path.join (CURRENT_DIR, 'LOG_CONOGRAPH.txt')
 
 app = Flask(__name__)
 
-def exec_run_cmd (cmd):
-    #if os.name != 'nt':
-    #    if not os.access (PATH_exe, os.X_OK):
-    #        os.chmod(PATH_exe, os.stat (PATH_exe).st_mode | stat.S_IEXEC)
-     
+def exec_run_cmd (cmd):     
     result = subprocess.run([PATH_exe],
                     input = cmd,
                 capture_output = True, text = True)    
@@ -85,12 +81,13 @@ def run_cpp_with_cntl():
     if os.path.exists (PATH_log): os.remove (PATH_log)
 
     pathDict = {'xml' : PATH_param, 'txt' : PATH_peak,
-                'histogramIgor' : PATH_peak, 'histogramIgor_pk' : PATH_peak}
+                #'histogramIgor' : PATH_peak, 'histogramIgor_pk' : PATH_peak,
+                'histogramigor' : PATH_peak, 'histogramigor_pk' : PATH_peak}
 
     for key in request.files:
         f = request.files[key]
         fname = f.name
-        suffix = fname.split('.')[-1]
+        suffix = fname.split('.')[-1].lower()
         path = pathDict[suffix]
         path = os.path.join (CURRENT_DIR, path)
         f.save(path)
