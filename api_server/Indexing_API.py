@@ -2,11 +2,10 @@ from flask import Flask, request, send_file, jsonify
 import xml.etree.ElementTree as ET
 import subprocess
 import os
+import time
 import stat
 import glob
 import shutil
-import threading
-lock = threading.Lock()
 
 def read_cntl_inp_xml (path):
     # XMLファイルを読み込む
@@ -36,22 +35,33 @@ if FOLDER_out is not None:
     os.makedirs (FOLDER_out, exist_ok = True)
 
 if os.name == 'nt':
-    PATH_exe = '.\Conograph.exe'
+    PATH_exe_1st = '.\Conograph_1st.exe'
+    PATH_exe_2nd = '.\Conograph_2nd.exe'
+
 else:
-    PATH_exe = os.path.join (CURRENT_DIR, 'Conograph')
-    if not os.access (PATH_exe, os.X_OK):
-            os.chmod(PATH_exe, os.stat (PATH_exe).st_mode | stat.S_IEXEC)
+    PATH_exe_1st = os.path.join (CURRENT_DIR, 'Conograph_1st')
+    PATH_exe_2nd = os.path.join (CURRENT_DIR, 'Conograph_2nd')
+    if not os.access (PATH_exe_1st, os.X_OK):
+            os.chmod(PATH_exe_1st, os.stat (PATH_exe_1st).st_mode | stat.S_IEXEC)
+    if not os.access (PATH_exe_2nd, os.X_OK):
+            os.chmod(PATH_exe_2nd, os.stat (PATH_exe_2nd).st_mode | stat.S_IEXEC)
 
 PATH_log = os.path.join (CURRENT_DIR, 'LOG_CONOGRAPH.txt')
 
-
 app = Flask(__name__)
 
-def exec_run_cmd (cmd):     
-    result = subprocess.run([PATH_exe],
+def exec_run_cmd (cmd):
+    #print ('command', cmd) 
+    #start = time.time()
+    if cmd == 'quit\n':
+        result = subprocess.run([PATH_exe_1st],
                     input = cmd,
-                capture_output = True, text = True)    
-
+                capture_output = True, text = True)
+    else:
+        result = subprocess.run([PATH_exe_2nd],
+                    input = cmd,
+                capture_output = True, text = True)
+    #end = time.time(); print ('time : ', end - start, ' sec')
     return result
 
 def clean_output_folder ():
@@ -145,4 +155,4 @@ def get_output_zip ():
     
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port = 8100, debug = False)
+    app.run (host = "0.0.0.0", port = 8100, debug = False)
